@@ -5,6 +5,7 @@ import '../../core/widgets/brand_wordmark.dart';
 import '../../core/widgets/game_background.dart';
 import '../../core/widgets/sound_button.dart';
 import '../../core/widgets/sound_toggle_button.dart';
+import '../cutscene/cutscene_screen.dart';
 
 /// Menu principal do StartEnergy (landscape).
 ///
@@ -40,7 +41,15 @@ class MenuScreen extends StatelessWidget {
                         icon: Icons.play_arrow_rounded,
                         primary: true,
                         onPressed: () {
-                          // TODO: iniciar o Quiz 1 quando a tela existir.
+                          // Provisório: abre a cutscene para testes. Depois,
+                          // ao fim da cutscene, seguir para o Quiz 1.
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => CutsceneScreen(
+                                onFinished: () => Navigator.of(context).pop(),
+                              ),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 14),

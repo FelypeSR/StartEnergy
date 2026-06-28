@@ -8,6 +8,9 @@ abstract final class AppAssets {
   /// Fundo de sala de aula usado na tela de introdução e no menu.
   static const String backgroundGame = '$_images/backgroundgame.png';
 
+  /// Sprite do personagem guia (primeiro personagem da cutscene de introdução).
+  static const String linkSprite = '$_images/link_sprite.png';
+
   /// Música de fundo (loop). Caminho relativo a `assets/` para o audioplayers.
   static const String backgroundSong = 'audio/backgroundsong.mp3';
 
