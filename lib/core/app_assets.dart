@@ -1,0 +1,16 @@
+/// Caminhos centralizados dos assets do StartEnergy.
+///
+/// Referenciar sempre por aqui evita strings mágicas espalhadas pelas telas.
+abstract final class AppAssets {
+  static const String _images = 'assets/images';
+  static const String _audio = 'assets/audio';
+
+  /// Fundo de sala de aula usado na tela de introdução e no menu.
+  static const String backgroundGame = '$_images/backgroundgame.png';
+
+  /// Música de fundo (loop). Caminho relativo a `assets/` para o audioplayers.
+  static const String backgroundSong = 'audio/backgroundsong.mp3';
+
+  /// Efeito sonoro de toque em botões. Caminho relativo a `assets/`.
+  static const String touchSfx = 'audio/touch.mp3';
+}

@@ -1,30 +1,70 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:startenergy/main.dart';
+import 'package:startenergy/core/audio_controller.dart';
+import 'package:startenergy/core/widgets/sound_button.dart';
+import 'package:startenergy/core/widgets/sound_toggle_button.dart';
+import 'package:startenergy/features/menu/menu_screen.dart';
+import 'package:startenergy/features/splash/splash_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Splash mostra marca e chamada de toque', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
+    await tester.pump(const Duration(milliseconds: 900));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Toque para continuar'), findsOneWidget);
+    expect(find.byIcon(Icons.bolt), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('Toque dispara onContinue', (tester) async {
+    var tapped = false;
+    await tester.pumpWidget(
+      MaterialApp(home: SplashScreen(onContinue: () => tapped = true)),
+    );
+
+    await tester.tap(find.byType(SplashScreen));
+    expect(tapped, isTrue);
+  });
+
+  testWidgets('Menu mostra JOGAR e o botão de som', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: MenuScreen()));
+
+    expect(find.text('JOGAR'), findsOneWidget);
+    expect(find.byType(SoundToggleButton), findsOneWidget);
+  });
+
+  testWidgets('SoundButton dispara onPressed ao tocar', (tester) async {
+    var pressed = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SoundButton(
+            label: 'OK',
+            icon: Icons.check,
+            onPressed: () => pressed = true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(SoundButton));
     await tester.pump();
+    expect(pressed, isTrue);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('Botão de som alterna o estado do áudio', (tester) async {
+    final controller = AudioController.instance;
+    final inicial = controller.enabled;
+
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SoundToggleButton())),
+    );
+
+    await tester.tap(find.byType(SoundToggleButton));
+    await tester.pump();
+    expect(controller.enabled, !inicial);
+
+    // Restaura o estado global para não afetar outros testes.
+    await controller.setEnabled(inicial);
   });
 }
