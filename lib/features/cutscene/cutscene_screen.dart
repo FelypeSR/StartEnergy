@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_assets.dart';
 import '../../core/app_colors.dart';
+import '../../core/audio_controller.dart';
 import '../../core/widgets/game_background.dart';
 import '../../core/widgets/sheet_sprite.dart';
+import '../../core/widgets/sound_toggle_button.dart';
 import '../../core/widgets/speech_balloon.dart';
 import 'cutscene_frame.dart';
 import 'cutscene_script.dart';
@@ -43,6 +45,7 @@ class _CutsceneScreenState extends State<CutsceneScreen>
   void initState() {
     super.initState();
     _typeController = AnimationController(vsync: this);
+    AudioController.instance.startCutsceneMusic();
     _playFrame();
   }
 
@@ -61,6 +64,7 @@ class _CutsceneScreenState extends State<CutsceneScreen>
 
   @override
   void dispose() {
+    AudioController.instance.stopCutsceneMusic();
     _typeController.dispose();
     super.dispose();
   }
@@ -76,6 +80,7 @@ class _CutsceneScreenState extends State<CutsceneScreen>
 
   void _handleTap() {
     if (_finished) return;
+    AudioController.instance.playTouchScene();
     if (_typeController.isAnimating) {
       _typeController.value = 1; // revela a fala inteira de uma vez
       return;
@@ -116,7 +121,11 @@ class _CutsceneScreenState extends State<CutsceneScreen>
                       asset: _frame.characterSprite,
                       columns: _frame.spriteColumns,
                       index: _frame.spriteIndex,
-                      height: screenHeight * 0.72,
+                      height: screenHeight * 0.82,
+                      // O sheet (Link.png) já tem boa folga lateral entre as
+                      // poses (sem respingo → sideTrim 0); só aparamos o vão
+                      // transparente sob os pés p/ encostar no chão.
+                      bottomTrim: 0.31,
                     ),
                   ),
                 ),
@@ -154,6 +163,15 @@ class _CutsceneScreenState extends State<CutsceneScreen>
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: _SkipButton(onSkip: _finish),
+                  ),
+                ),
+
+                // Botão de mudo (música) — canto superior direito.
+                const Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SoundToggleButton(),
                   ),
                 ),
               ],
