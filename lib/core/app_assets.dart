@@ -11,6 +11,11 @@ abstract final class AppAssets {
   /// Sprite do personagem guia (primeiro personagem da cutscene de introdução).
   static const String linkSprite = '$_images/Link.png';
 
+  /// Cartas de partícula do quiz (tutorial e level 1).
+  static const String protonCard = '$_images/proton.png';
+  static const String eletronCard = '$_images/eletron.png';
+  static const String neutronCard = '$_images/neutron.png';
+
   /// Música de fundo (loop). Caminho relativo a `assets/` para o audioplayers.
   static const String backgroundSong = 'audio/backgroundsong.mp3';
 
@@ -22,4 +27,7 @@ abstract final class AppAssets {
 
   /// Efeito sonoro de toque na tela durante a cutscene. Relativo a `assets/`.
   static const String touchSceneSfx = 'audio/touchscene.mp3';
+
+  /// Música do level 1 e do seu tutorial (loop). Relativo a `assets/`.
+  static const String level1Song = 'audio/song_level1.mp3';
 }

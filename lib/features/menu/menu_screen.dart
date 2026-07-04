@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/widgets/brand_wordmark.dart';
 import '../../core/widgets/game_background.dart';
 import '../../core/widgets/sound_button.dart';
 import '../../core/widgets/sound_toggle_button.dart';
 import '../cutscene/cutscene_screen.dart';
+import '../tutorial/tutorial_screen.dart';
 
 /// Menu principal do StartEnergy (landscape).
 ///
@@ -21,38 +23,47 @@ class MenuScreen extends StatelessWidget {
         child: SafeArea(
           child: Stack(
             children: [
-              const Align(
+              Align(
                 alignment: Alignment.topRight,
                 child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: SoundToggleButton(),
+                  padding: EdgeInsets.all(16.r),
+                  child: const SoundToggleButton(),
                 ),
               ),
               Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  padding: EdgeInsets.symmetric(vertical: 24.r),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const BrandWordmark(fontSize: 40),
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28.r),
                       SoundButton(
                         label: 'JOGAR',
                         icon: Icons.play_arrow_rounded,
                         primary: true,
                         onPressed: () {
-                          // Provisório: abre a cutscene para testes. Depois,
-                          // ao fim da cutscene, seguir para o Quiz 1.
-                          Navigator.of(context).push(
+                          // Fluxo do JOGAR: cutscene → tutorial → level 1.
+                          // (Navegação provisória até existir o AppRouter.)
+                          final navigator = Navigator.of(context);
+                          navigator.push(
                             MaterialPageRoute<void>(
                               builder: (_) => CutsceneScreen(
-                                onFinished: () => Navigator.of(context).pop(),
+                                onFinished: () => navigator.pushReplacement(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => TutorialScreen(
+                                      // TODO: seguir para o level 1 quando
+                                      // ele existir; por ora volta ao menu.
+                                      onFinished: () => navigator.pop(),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           );
                         },
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.r),
                       SoundButton(
                         label: 'Fases do jogo',
                         icon: Icons.flag_rounded,
@@ -60,7 +71,7 @@ class MenuScreen extends StatelessWidget {
                           // TODO: abrir a seleção de fases.
                         },
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.r),
                       SoundButton(
                         label: 'Créditos',
                         icon: Icons.info_outline_rounded,
@@ -68,7 +79,7 @@ class MenuScreen extends StatelessWidget {
                           // TODO: abrir créditos / sobre.
                         },
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.r),
                       SoundButton(
                         label: 'Sair',
                         icon: Icons.exit_to_app_rounded,

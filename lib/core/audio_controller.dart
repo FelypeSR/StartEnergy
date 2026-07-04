@@ -21,15 +21,17 @@ class AudioController extends ChangeNotifier {
   /// Música do menu/início (loop).
   final AudioPlayer _player = AudioPlayer();
 
-  /// Música própria da cutscene (loop), tocada só durante a cutscene.
-  final AudioPlayer _cutscenePlayer = AudioPlayer();
+  /// Música de cena (cutscene, tutorial, fases), tocada no lugar da do menu.
+  final AudioPlayer _scenePlayer = AudioPlayer();
 
   /// Player dedicado a efeitos curtos (toques), para não interromper a música.
   final AudioPlayer _sfxPlayer = AudioPlayer();
 
   bool _enabled = true;
   bool _started = false;
-  bool _cutscenePlaying = false;
+
+  /// Asset da música de cena em execução (null = nenhuma; toca a do menu).
+  String? _sceneAsset;
 
   /// Música ligada/desligada (reflete no botão de toggle). Não afeta os SFX.
   bool get enabled => _enabled;
@@ -47,27 +49,34 @@ class AudioController extends ChangeNotifier {
     await _player.play(AssetSource(AppAssets.backgroundSong));
   }
 
-  /// Inicia a música da cutscene em loop contínuo e pausa a música do menu
-  /// (para não sobrepor). Idempotente. Respeita o mudo via volume.
-  Future<void> startCutsceneMusic() async {
-    if (_cutscenePlaying) return;
-    _cutscenePlaying = true;
+  /// Inicia a música de cena [asset] em loop e pausa a música do menu (para
+  /// não sobrepor). Idempotente por asset; trocar de cena troca a música.
+  /// Respeita o mudo via volume.
+  Future<void> startSceneMusic(String asset) async {
+    if (_sceneAsset == asset) return;
+    final wasInScene = _sceneAsset != null;
+    _sceneAsset = asset;
     try {
-      if (_started) await _player.pause();
-      await _cutscenePlayer.setReleaseMode(ReleaseMode.loop);
-      await _cutscenePlayer.setVolume(_enabled ? _kVolume : 0);
-      await _cutscenePlayer.play(AssetSource(AppAssets.cutsceneSong));
+      if (_started && !wasInScene) await _player.pause();
+      await _scenePlayer.stop();
+      await _scenePlayer.setReleaseMode(ReleaseMode.loop);
+      await _scenePlayer.setVolume(_enabled ? _kVolume : 0);
+      await _scenePlayer.play(AssetSource(asset));
     } catch (_) {
       // som não deve quebrar a tela (ex.: ambiente de teste sem áudio)
     }
   }
 
-  /// Para a música da cutscene e retoma a música do menu.
-  Future<void> stopCutsceneMusic() async {
-    if (!_cutscenePlaying) return;
-    _cutscenePlaying = false;
+  /// Para a música de cena [asset] e retoma a música do menu.
+  ///
+  /// Só age se [asset] ainda for a cena atual: numa transição de tela
+  /// (ex.: cutscene → tutorial) a nova cena inicia a música ANTES de a
+  /// anterior ser descartada, e o dispose da antiga não deve derrubá-la.
+  Future<void> stopSceneMusic(String asset) async {
+    if (_sceneAsset != asset) return;
+    _sceneAsset = null;
     try {
-      await _cutscenePlayer.stop();
+      await _scenePlayer.stop();
       if (_started) await _player.resume();
     } catch (_) {
       // ignorado de propósito
@@ -102,9 +111,9 @@ class AudioController extends ChangeNotifier {
     _enabled = value;
     final volume = _enabled ? _kVolume : 0.0;
     try {
-      // Só mexe nos players já tocando; senão start/startCutsceneMusic aplicam.
+      // Só mexe nos players já tocando; senão start/startSceneMusic aplicam.
       if (_started) await _player.setVolume(volume);
-      if (_cutscenePlaying) await _cutscenePlayer.setVolume(volume);
+      if (_sceneAsset != null) await _scenePlayer.setVolume(volume);
     } catch (_) {
       // ignorado de propósito
     }
@@ -114,7 +123,7 @@ class AudioController extends ChangeNotifier {
   @override
   void dispose() {
     _player.dispose();
-    _cutscenePlayer.dispose();
+    _scenePlayer.dispose();
     _sfxPlayer.dispose();
     super.dispose();
   }

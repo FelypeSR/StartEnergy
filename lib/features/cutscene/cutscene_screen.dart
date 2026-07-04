@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_assets.dart';
 import '../../core/app_colors.dart';
@@ -45,7 +46,7 @@ class _CutsceneScreenState extends State<CutsceneScreen>
   void initState() {
     super.initState();
     _typeController = AnimationController(vsync: this);
-    AudioController.instance.startCutsceneMusic();
+    AudioController.instance.startSceneMusic(AppAssets.cutsceneSong);
     _playFrame();
   }
 
@@ -64,7 +65,7 @@ class _CutsceneScreenState extends State<CutsceneScreen>
 
   @override
   void dispose() {
-    AudioController.instance.stopCutsceneMusic();
+    AudioController.instance.stopSceneMusic(AppAssets.cutsceneSong);
     _typeController.dispose();
     super.dispose();
   }
@@ -111,49 +112,72 @@ class _CutsceneScreenState extends State<CutsceneScreen>
           child: SafeArea(
             child: Stack(
               children: [
-                // Personagem — canto inferior direito, "no chão". É um sprite
-                // sheet: a pose troca conforme o quadro atual (spriteIndex).
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: SheetSprite(
-                      asset: _frame.characterSprite,
-                      columns: _frame.spriteColumns,
-                      index: _frame.spriteIndex,
-                      height: screenHeight * 0.82,
-                      // O sheet (Link.png) já tem boa folga lateral entre as
-                      // poses (sem respingo → sideTrim 0); só aparamos o vão
-                      // transparente sob os pés p/ encostar no chão.
-                      bottomTrim: 0.31,
-                    ),
-                  ),
-                ),
-
-                // Balão de fala — topo, com efeito de digitação. O AnimatedBuilder
-                // isola o rebuild só no balão, sem reconstruir o personagem.
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 720),
-                      child: AnimatedBuilder(
-                        animation: _typeController,
-                        builder: (context, _) {
-                          final full = _frame.text;
-                          final shown = full.substring(
-                            0,
-                            (full.length * _typeController.value).round(),
-                          );
-                          return SpeechBalloon(
-                            text: shown,
-                            showContinueHint: !_typeController.isAnimating,
-                            isLast: _isLast,
-                          );
-                        },
+                // Balão e personagem dividem a tela num Row: o balão fica com
+                // o espaço à esquerda e o personagem com a coluna da direita,
+                // "no chão" — assim o balão nunca cobre o rosto, em qualquer
+                // tamanho de tela ou comprimento de fala.
+                Positioned.fill(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Balão de fala — topo, encostado no personagem (o
+                      // rabicho fica a 96dp da borda direita, apontando p/
+                      // ele). O AnimatedBuilder isola o rebuild da digitação
+                      // só no balão, sem reconstruir o personagem.
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(16.r, 12.r, 8.r, 0),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 700.r),
+                              child: AnimatedBuilder(
+                                animation: _typeController,
+                                builder: (context, _) {
+                                  final full = _frame.text;
+                                  final shown = full.substring(
+                                    0,
+                                    (full.length * _typeController.value)
+                                        .round(),
+                                  );
+                                  return SpeechBalloon(
+                                    text: shown,
+                                    showContinueHint:
+                                        !_typeController.isAnimating,
+                                    isLast: _isLast,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+
+                      // Personagem — sprite sheet: a pose troca conforme o
+                      // quadro atual (spriteIndex).
+                      Padding(
+                        padding: EdgeInsets.only(right: 16.r),
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: SheetSprite(
+                            asset: _frame.characterSprite,
+                            columns: _frame.spriteColumns,
+                            index: _frame.spriteIndex,
+                            height: screenHeight * 0.62,
+                            // O sheet (Link.png) já tem boa folga lateral
+                            // entre as poses (sem respingo → sideTrim 0).
+                            // Aparamos o vão transparente sob os pés (p/
+                            // encostar no chão) e acima da cabeça (p/ a caixa
+                            // do sprite corresponder ao desenho). O desenho
+                            // ocupa as linhas ~18%–67% da célula; 0.62 da
+                            // altura da tela dá o mesmo tamanho visível que
+                            // 0.82 dava sem o topTrim.
+                            topTrim: 0.17,
+                            bottomTrim: 0.31,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -161,17 +185,17 @@ class _CutsceneScreenState extends State<CutsceneScreen>
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12.r),
                     child: _SkipButton(onSkip: _finish),
                   ),
                 ),
 
                 // Botão de mudo (música) — canto superior direito.
-                const Align(
+                Align(
                   alignment: Alignment.topRight,
                   child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: SoundToggleButton(),
+                    padding: EdgeInsets.all(12.r),
+                    child: const SoundToggleButton(),
                   ),
                 ),
               ],
@@ -196,20 +220,21 @@ class _SkipButton extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onSkip,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.r, vertical: 8.r),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.fast_forward_rounded,
-                size: 18,
+                size: 18.r,
                 color: AppColors.electricCyan,
               ),
-              SizedBox(width: 6),
+              SizedBox(width: 6.r),
               Text(
                 'Pular',
                 style: TextStyle(
+                  fontSize: 14.sp,
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
