@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../app_colors.dart';
 import '../audio_controller.dart';
@@ -30,12 +31,12 @@ class SoundToggleButton extends StatelessWidget {
               customBorder: const CircleBorder(),
               onTap: controller.toggle,
               child: SizedBox(
-                width: 48,
-                height: 48,
+                width: 48.r,
+                height: 48.r,
                 child: Icon(
                   enabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
                   color: enabled ? AppColors.menuBlue : AppColors.textMuted,
-                  size: 26,
+                  size: 26.r,
                 ),
               ),
             ),

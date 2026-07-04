@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:startenergy/core/app_assets.dart';
 import 'package:startenergy/features/cutscene/cutscene_frame.dart';
 import 'package:startenergy/features/cutscene/cutscene_screen.dart';
 
+import 'test_app.dart';
+
 void main() {
+  // Sprite real (com as colunas corretas do sheet): a tela pré-carrega os
+  // assets dos quadros e um caminho inexistente faria o precacheImage
+  // reportar erro dentro do teste.
   const frames = [
-    CutsceneFrame(characterSprite: 'assets/images/link_sprite.png', text: 'Oi'),
-    CutsceneFrame(characterSprite: 'assets/images/link_sprite.png', text: 'Fim'),
+    CutsceneFrame(
+      characterSprite: AppAssets.linkSprite,
+      spriteColumns: 3,
+      text: 'Oi',
+    ),
+    CutsceneFrame(
+      characterSprite: AppAssets.linkSprite,
+      spriteColumns: 3,
+      spriteIndex: 1,
+      text: 'Fim',
+    ),
   ];
 
   Future<void> pumpCutscene(
@@ -14,9 +29,7 @@ void main() {
     required VoidCallback onFinished,
   }) {
     return tester.pumpWidget(
-      MaterialApp(
-        home: CutsceneScreen(frames: frames, onFinished: onFinished),
-      ),
+      testApp(CutsceneScreen(frames: frames, onFinished: onFinished)),
     );
   }
 

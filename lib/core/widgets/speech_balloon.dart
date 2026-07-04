@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Balão de fala desenhado (sem sprite): retângulo arredondado com um rabicho
 /// apontando para o personagem (canto inferior direito).
@@ -31,44 +32,49 @@ class SpeechBalloon extends StatelessWidget {
     return CustomPaint(
       painter: const _BalloonPainter(),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(22, 18, 22, 26),
+        padding: EdgeInsets.fromLTRB(22.r, 18.r, 22.r, 26.r),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               text,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: 18.sp,
                 height: 1.35,
                 fontWeight: FontWeight.w700,
                 color: _ink,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6.r),
             // Sempre presente para manter a altura estável; só a opacidade muda.
             Opacity(
               opacity: showContinueHint ? 1 : 0,
               child: Align(
                 alignment: Alignment.centerRight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      isLast ? 'Toque para começar' : 'Toque para continuar',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                // Encolhe a dica se o balão for estreito (ex.: tutorial),
+                // em vez de estourar a largura.
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isLast ? 'Toque para começar' : 'Toque para continuar',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: _hint,
+                        ),
+                      ),
+                      SizedBox(width: 4.r),
+                      Icon(
+                        Icons.touch_app_outlined,
+                        size: 14.r,
                         color: _hint,
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.touch_app_outlined,
-                      size: 14,
-                      color: _hint,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -82,6 +88,8 @@ class SpeechBalloon extends StatelessWidget {
 class _BalloonPainter extends CustomPainter {
   const _BalloonPainter();
 
+  // Em dp de referência; escalados via .r no paint (a escala é fixa na sessão,
+  // então o shouldRepaint continua falso).
   static const double _radius = 22;
   static const double _tailWidth = 26;
   static const double _tailHeight = 16;
@@ -89,18 +97,18 @@ class _BalloonPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final bodyHeight = size.height - _tailHeight;
+    final bodyHeight = size.height - _tailHeight.r;
     final body = RRect.fromRectAndRadius(
       Rect.fromLTWH(0, 0, size.width, bodyHeight),
-      const Radius.circular(_radius),
+      Radius.circular(_radius.r),
     );
 
-    final tailX = size.width - _tailCenterFromRight;
+    final tailX = size.width - _tailCenterFromRight.r;
     final path = Path()..addRRect(body);
     path
-      ..moveTo(tailX - _tailWidth / 2, bodyHeight - 1)
-      ..lineTo(tailX, bodyHeight + _tailHeight)
-      ..lineTo(tailX + _tailWidth / 2, bodyHeight - 1)
+      ..moveTo(tailX - _tailWidth.r / 2, bodyHeight - 1)
+      ..lineTo(tailX, bodyHeight + _tailHeight.r)
+      ..lineTo(tailX + _tailWidth.r / 2, bodyHeight - 1)
       ..close();
 
     canvas.drawShadow(path, Colors.black.withValues(alpha: 0.4), 8, false);

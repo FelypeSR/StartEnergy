@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/app_colors.dart';
 import 'core/audio_controller.dart';
@@ -26,21 +27,33 @@ class StartEnergyApp extends StatelessWidget {
 
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
+  /// Resolução de referência do design (landscape 16:9, 412dp de altura).
+  ///
+  /// Com a referência no aspecto 16:9, `.r`/`.sp` seguem a escala da ALTURA em
+  /// qualquer celular (que é sempre 16:9 ou mais largo em landscape): telas
+  /// com 412dp+ de altura ficam com o layout em tamanho pleno e telas menores
+  /// encolhem proporcionalmente — sem tarjas e sempre em resolução nativa.
+  static const Size designSize = Size(732, 412);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StartEnergy',
-      debugShowCheckedModeBanner: false,
-      navigatorKey: _navigatorKey,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: AppColors.backgroundTop,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.electricYellow,
-          brightness: Brightness.dark,
+    return ScreenUtilInit(
+      designSize: designSize,
+      minTextAdapt: true,
+      builder: (context, _) => MaterialApp(
+        title: 'StartEnergy',
+        debugShowCheckedModeBanner: false,
+        navigatorKey: _navigatorKey,
+        theme: ThemeData(
+          useMaterial3: true,
+          scaffoldBackgroundColor: AppColors.backgroundTop,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.electricYellow,
+            brightness: Brightness.dark,
+          ),
         ),
+        home: SplashScreen(onContinue: _startGame),
       ),
-      home: SplashScreen(onContinue: _startGame),
     );
   }
 

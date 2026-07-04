@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../app_colors.dart';
 import '../audio_controller.dart';
@@ -30,14 +31,14 @@ class SoundButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final audio = controller ?? AudioController.instance;
     return SizedBox(
-      width: primary ? 280 : 240,
-      height: primary ? 60 : 52,
+      width: (primary ? 280 : 240).r,
+      height: (primary ? 60 : 52).r,
       child: ElevatedButton.icon(
         onPressed: () {
           audio.playTouch();
           onPressed();
         },
-        icon: Icon(icon, color: Colors.white),
+        icon: Icon(icon, color: Colors.white, size: 24.r),
         label: Text(label),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.menuBlue,
@@ -45,10 +46,10 @@ class SoundButton extends StatelessWidget {
           elevation: primary ? 8 : 3,
           shadowColor: AppColors.menuBlue.withValues(alpha: 0.6),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
           ),
           textStyle: TextStyle(
-            fontSize: primary ? 22 : 18,
+            fontSize: (primary ? 22 : 18).sp,
             fontWeight: primary ? FontWeight.w800 : FontWeight.w600,
             letterSpacing: 0.5,
           ),

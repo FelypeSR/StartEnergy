@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_colors.dart';
 import '../../core/widgets/brand_wordmark.dart';
@@ -86,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
                   child: FadeTransition(
                     opacity: _contentFade,
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 28),
+                      padding: EdgeInsets.only(bottom: 28.r),
                       child: _TapToContinue(animation: _pulseController),
                     ),
                   ),
@@ -109,7 +110,7 @@ class _Logo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24.r),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const RadialGradient(
@@ -118,24 +119,24 @@ class _Logo extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: AppColors.electricYellow.withValues(alpha: 0.35),
-                blurRadius: 40,
-                spreadRadius: 4,
+                blurRadius: 40.r,
+                spreadRadius: 4.r,
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.bolt,
-            size: 84,
+            size: 84.r,
             color: AppColors.electricYellow,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.r),
         const BrandWordmark(),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.r),
         Text(
           'Aprenda eletricidade jogando',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 16.sp,
             color: AppColors.textMuted,
             letterSpacing: 0.5,
           ),
@@ -159,14 +160,14 @@ class _TapToContinue extends StatelessWidget {
         children: [
           Icon(
             Icons.touch_app_outlined,
-            size: 22,
+            size: 22.r,
             color: AppColors.electricCyan,
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.r),
           Text(
             'Toque para continuar',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               letterSpacing: 0.5,

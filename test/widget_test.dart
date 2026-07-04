@@ -7,9 +7,11 @@ import 'package:startenergy/core/widgets/sound_toggle_button.dart';
 import 'package:startenergy/features/menu/menu_screen.dart';
 import 'package:startenergy/features/splash/splash_screen.dart';
 
+import 'test_app.dart';
+
 void main() {
   testWidgets('Splash mostra marca e chamada de toque', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
+    await tester.pumpWidget(testApp(const SplashScreen()));
     await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('Toque para continuar'), findsOneWidget);
@@ -19,7 +21,7 @@ void main() {
   testWidgets('Toque dispara onContinue', (tester) async {
     var tapped = false;
     await tester.pumpWidget(
-      MaterialApp(home: SplashScreen(onContinue: () => tapped = true)),
+      testApp(SplashScreen(onContinue: () => tapped = true)),
     );
 
     await tester.tap(find.byType(SplashScreen));
@@ -27,7 +29,7 @@ void main() {
   });
 
   testWidgets('Menu mostra JOGAR e o botão de som', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: MenuScreen()));
+    await tester.pumpWidget(testApp(const MenuScreen()));
 
     expect(find.text('JOGAR'), findsOneWidget);
     expect(find.byType(SoundToggleButton), findsOneWidget);
@@ -36,8 +38,8 @@ void main() {
   testWidgets('SoundButton dispara onPressed ao tocar', (tester) async {
     var pressed = false;
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
+      testApp(
+        Scaffold(
           body: SoundButton(
             label: 'OK',
             icon: Icons.check,
@@ -57,7 +59,7 @@ void main() {
     final inicial = controller.enabled;
 
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: SoundToggleButton())),
+      testApp(const Scaffold(body: SoundToggleButton())),
     );
 
     await tester.tap(find.byType(SoundToggleButton));
