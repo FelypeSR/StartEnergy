@@ -6,6 +6,7 @@ import 'package:startenergy/core/widgets/sound_button.dart';
 import 'package:startenergy/features/level1/quiz_models.dart';
 import 'package:startenergy/features/level1/quiz_screen.dart';
 import 'package:startenergy/features/level1/quiz_script.dart';
+import 'package:startenergy/features/level2/quiz2_script.dart';
 
 import 'test_app.dart';
 
@@ -46,6 +47,46 @@ void main() {
       expect(starsForCorrect(2, 5), 1);
       expect(starsForCorrect(1, 5), 1);
       expect(starsForCorrect(0, 5), 0);
+    });
+  });
+
+  group('quiz2Questions (level 2)', () {
+    test('tem 3 questões com alternativas e resposta válidas', () {
+      expect(quiz2Questions, hasLength(3));
+      for (final q in quiz2Questions) {
+        expect(q.text, isNotEmpty);
+        expect(q.options, hasLength(3));
+        expect(q.answerIndex, inInclusiveRange(0, q.options.length - 1));
+      }
+    });
+
+    testWidgets('QuizScreen roda o quiz 2 até o resultado', (tester) async {
+      List<AnswerResult>? results;
+      await tester.pumpWidget(
+        testApp(
+          QuizScreen(
+            questions: quiz2Questions,
+            random: _IdentityRandom(),
+            onFinished: (r) => results = r,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      for (final q in quiz2Questions) {
+        expect(find.text(q.text), findsOneWidget);
+        await tester.tap(find.text(q.options[q.answerIndex]));
+        await tester.pumpAndSettle();
+      }
+
+      expect(
+        find.text('Você acertou 3 de ${quiz2Questions.length}!'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Continuar'));
+      await tester.pumpAndSettle();
+      expect(results, hasLength(quiz2Questions.length));
+      expect(results!.every((r) => r.correct), isTrue);
     });
   });
 

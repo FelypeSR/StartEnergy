@@ -41,4 +41,7 @@ abstract final class AppAssets {
 
   /// Música do level 1 e do seu tutorial (loop). Relativo a `assets/`.
   static const String level1Song = 'audio/song_level1.mp3';
+
+  /// Música do level 2 (loop). Relativo a `assets/`.
+  static const String level2Song = 'audio/song_level2.mp3';
 }

@@ -11,7 +11,7 @@ import '../../core/widgets/sound_button.dart';
 import 'quiz_models.dart';
 import 'quiz_script.dart';
 
-/// Level 1 — Quiz 1.
+/// Quiz de alternativas (levels 1 e 2 — muda só [questions] e [music]).
 ///
 /// Uma questão por vez; as alternativas usam o botão padrão do menu e têm a
 /// posição re-sorteada a cada questão (anti-decoreba). O toque numa
@@ -24,11 +24,15 @@ class QuizScreen extends StatefulWidget {
   const QuizScreen({
     super.key,
     this.questions = quizQuestions,
+    this.music = AppAssets.level1Song,
     this.onFinished,
     this.random,
   });
 
   final List<QuizQuestion> questions;
+
+  /// Música da fase (loop), trocada via [AudioController.startSceneMusic].
+  final String music;
 
   /// Chamado ao responder a última questão, com todos os resultados.
   final ValueChanged<List<AnswerResult>>? onFinished;
@@ -56,13 +60,13 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    AudioController.instance.startSceneMusic(AppAssets.level1Song);
+    AudioController.instance.startSceneMusic(widget.music);
     _order = shuffledOrder(_question.options.length, _random);
   }
 
   @override
   void dispose() {
-    AudioController.instance.stopSceneMusic(AppAssets.level1Song);
+    AudioController.instance.stopSceneMusic(widget.music);
     super.dispose();
   }
 

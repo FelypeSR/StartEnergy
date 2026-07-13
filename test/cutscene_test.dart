@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:startenergy/core/app_assets.dart';
 import 'package:startenergy/core/characters.dart';
 import 'package:startenergy/features/cutscene/cutscene2.dart';
+import 'package:startenergy/features/cutscene/cutscene3.dart';
 import 'package:startenergy/features/cutscene/cutscene_frame.dart';
 import 'package:startenergy/features/cutscene/cutscene_screen.dart';
 
@@ -64,7 +65,43 @@ void main() {
     expect(finished, isTrue);
   });
 
-  group('cutscene 2 (Lina)', () {
+  group('cutscene 2 (Link, corrente elétrica)', () {
+    test('todos os quadros usam o sheet do Link com poses e trims válidos', () {
+      for (final frame in correnteCutscene) {
+        expect(frame.characterSprite, AppAssets.linkSprite);
+        expect(frame.spriteColumns, LinkPose.columns);
+        expect(
+          frame.spriteIndex,
+          inInclusiveRange(0, LinkPose.columns - 1),
+        );
+        expect(frame.topTrim, LinkPose.topTrim);
+        expect(frame.bottomTrim, LinkPose.bottomTrim);
+        expect(frame.text, isNotEmpty);
+      }
+    });
+
+    testWidgets('toca do início ao fim no CutsceneScreen', (tester) async {
+      var finished = false;
+      await tester.pumpWidget(
+        testApp(
+          CutsceneScreen(
+            frames: correnteCutscene,
+            onFinished: () => finished = true,
+          ),
+        ),
+      );
+
+      for (final frame in correnteCutscene) {
+        await tester.pumpAndSettle(); // conclui a digitação da fala
+        expect(find.text(frame.text), findsOneWidget);
+        await tester.tap(find.byType(CutsceneScreen));
+      }
+      await tester.pump();
+      expect(finished, isTrue);
+    });
+  });
+
+  group('cutscene 3 (Lina)', () {
     test('todos os quadros usam o sheet da Lina com poses válidas', () {
       for (final frame in linaCutscene) {
         expect(frame.characterSprite, AppAssets.linaSprite);
