@@ -17,6 +17,8 @@ Orientação **landscape** travada. Telas de início e menu já implementadas; g
 
 - `cupertino_icons: ^1.0.8`
 - `audioplayers: ^6.8.1` — música de fundo/cutscene (loop) e efeitos de toque
+- `wakelock_plus: ^1.6.1` — mantém a tela acesa o jogo inteiro (habilitado no
+  `main()`; sem ele o timeout do aparelho apagava a tela em cutscenes/questões)
 - `flutter_screenutil: ^5.9.3` — escala adaptativa de tela (estilo Canvas Scaler
   do Unity). Referência de design: **732×412** (landscape 16:9), definida em
   `StartEnergyApp.designSize` e aplicada via `ScreenUtilInit` no `main.dart`.
@@ -34,7 +36,8 @@ lib/
   core/
     app_colors.dart               # paleta (menuBlue #1E90FF, acentos elétricos)
     app_assets.dart               # caminhos de assets
-    characters.dart               # poses dos sprite sheets dos guias (LinaPose; 6 colunas)
+    characters.dart               # poses dos sprite sheets dos guias (LinkPose 3 colunas +
+                                   #   trims do sheet; LinaPose 6 colunas)
     audio_controller.dart         # singleton: música do menu + música de CENA (loop) + SFX.
                                    #   startSceneMusic(asset)/stopSceneMusic(asset): cutscene e
                                    #   fases trocam a música pausando a do menu; o stop só age
@@ -48,13 +51,20 @@ lib/
       sound_toggle_button.dart     # liga/desliga som
       speech_balloon.dart          # balão de fala DESENHADO (CustomPainter + rabicho)
       sheet_sprite.dart            # mostra UMA coluna de um sprite sheet horizontal
+      formula_card.dart            # laboratório da Lei de Ohm: readout I = V ÷ R ao vivo +
+                                   #   OhmCircuit + barras de tensão/resistência (Sliders)
+      ohm_circuit.dart             # circuito animado (CustomPainter + Ticker): bateria,
+                                   #   resistor e elétrons cuja velocidade segue a corrente;
+                                   #   repaint isolado via ValueNotifier (sem rebuild da árvore)
   features/
     splash/splash_screen.dart      # "toque para continuar" → inicia música + menu
     menu/menu_screen.dart          # JOGAR / Fases / Créditos / Sair + toggle de som
     cutscene/
       cutscene_frame.dart          # modelo de 1 quadro (sprite + fala + trims do sheet)
       cutscene_script.dart         # roteiro da intro (Link; falas ainda PROVISÓRIAS)
-      cutscene2.dart               # roteiro da cutscene 2 (Lina apresenta a Lei de Ohm;
+      cutscene2.dart               # roteiro da cutscene 2 (Link explica corrente elétrica e
+                                   #   condutores; falas FINAIS do Questsquiz.md)
+      cutscene3.dart               # roteiro da cutscene 3 (Lina apresenta a Lei de Ohm;
                                    #   falas PROVISÓRIAS — TODO(falas))
       cutscene_screen.dart         # tela: fundo + personagem + balão (digitação) + Pular + mudo;
                                    #   toca cutscene.mp3 (loop) e SFX de toque na tela
@@ -73,11 +83,16 @@ lib/
       quiz_models.dart             # QuizQuestion, AnswerResult, shuffledOrder, starsForCorrect
                                    #   (tudo certo → 3★ · ≥ metade → 2★ · ≥ 1 acerto → 1★ · 0 → 0★)
       quiz_script.dart             # ARQUIVO EDITÁVEL: as 5 questões do Quiz 1 (Questsquiz.md)
-      quiz_screen.dart             # Quiz 1: alternativas re-sorteadas (anti-decoreba), avança
-                                   #   sempre sem feedback; no fim mostra _QuizResult (estrelas
-                                   #   com bounce + Continuar) e onFinished recebe os resultados
-      leideohm_screen.dart         # fase Lei de Ohm (V = R · I): Lina + balão (ProfessorWidget);
-                                   #   mecânica da fórmula PENDENTE — toque conclui (provisório)
+      quiz_screen.dart             # quiz de alternativas (levels 1 e 2 — muda questions/music):
+                                   #   re-sorteadas (anti-decoreba), avança sempre sem feedback;
+                                   #   no fim mostra _QuizResult (estrelas com bounce + Continuar)
+                                   #   e onFinished recebe os resultados
+      leideohm_screen.dart         # fase Lei de Ohm: FormulaCard (barras V/R + circuito animado,
+                                   #   estilo simulador PhET) + Lina/balão (ProfessorWidget, com
+                                   #   slot `action`); botão Concluir termina a fase
+    level2/
+      quiz2_script.dart            # ARQUIVO EDITÁVEL: as 3 questões do Quiz 2 (Questsquiz.md);
+                                   #   roda no mesmo QuizScreen (fundo do level 1, song_level2)
 assets/
   images/backgroundgame.png        # fundo de sala de aula
   images/Link.png                  # SPRITE SHEET do personagem-guia: 1536×1024 = 3 poses
@@ -91,13 +106,16 @@ assets/
   images/proton.png, eletron.png, neutron.png  # cartas de partícula (202×233; tutorial e Quiz 1)
   audio/backgroundsong.mp3         # música de fundo (menu)
   audio/cutscene.mp3               # música própria da cutscene (loop)
-  audio/song_level1.mp3 (e 2, 3)   # músicas das fases; a 1 também toca no tutorial
+  audio/song_level1.mp3 (e 2, 3)   # músicas das fases; a 1 também toca no tutorial,
+                                   #   a 2 toca no Quiz 2
   audio/touch.mp3                  # SFX de toque em botão
   audio/touchscene.mp3             # SFX de toque na tela durante a cutscene
 test/test_app.dart                 # helper: envolve widgets no ScreenUtilInit (obrigatório nos testes)
 test/widget_test.dart              # widget tests (splash/menu)
 test/cutscene_test.dart            # testes da cutscene (avanço, onFinished, Pular)
 test/tutorial_test.dart            # testes do tutorial (intro, ordem certa/errada, conclusão)
+test/leideohm_test.dart            # testes da fase Lei de Ohm (estrutura, corrente recalculada
+                                   #   no arraste, Concluir; SEM pumpAndSettle — Ticker infinito)
 test/small_screen_test.dart        # regressão de telas pequenas (568×320, 640×360, 732×412):
                                    #   menu sem rolagem, splash sem sobreposição, balão fora do sprite
 ```
@@ -121,7 +139,7 @@ flutter pub add <package>    # adicionar dependência
 Jogo educativo de eletricidade em **3 blocos lineares** (sem árvore binária — fluxo não é adaptativo):
 
 1. **Quiz 1** — opções em **imagem vetorizada (SVG)**; a rotação das imagens muda a cada passagem pelo estágio (anti-decoreba).
-2. **Quiz 2** — formato a definir.
+2. **Quiz 2** — 3 questões sobre corrente elétrica (`quiz2_script.dart`), no mesmo `QuizScreen` do Quiz 1; antecedido pela cutscene 2 (Link explica corrente/condutores).
 3. **Drag & Drop** — montar circuitos elétricos.
 
 - O quiz **avança independente de acerto/erro**; os resultados são gravados e a **revisão dos erros acontece só no fim (endphase)** — decisão para manter o jogo polido durante a partida.
@@ -136,7 +154,7 @@ Jogo educativo de eletricidade em **3 blocos lineares** (sem árvore binária �
 - **Áudio:** ao entrar, toca `cutscene.mp3` em loop e **pausa** a música do menu; ao sair (fim/Pular), retoma o menu. Cada toque na tela dispara `touchscene.mp3` (não pausa a música). Botão de **mudo** no canto superior direito (afeta só a música).
 - **Provisório:** os sprites já são finais (`Link.png`); **as falas** ainda são placeholders — ver `TODO(falas)` em `cutscene_script.dart`. A cutscene **deveria tocar só na 1ª vez** (precisa de `shared_preferences`), mas isso ainda não foi ligado.
 
-- **Fluxo atual de telas:** `SplashScreen` → `MenuScreen` → **JOGAR** → `CutsceneScreen` (Link) → `TutorialScreen` → loading → `QuizScreen` (Quiz 1 + estrelas) → `CutsceneScreen` (Lina, `linaCutscene`) → loading → `LeiDeOhmScreen` → volta ao menu. Encadeado em `MenuScreen._startPlay` e métodos `_to*` (um por etapa), via `pushReplacement` — provisório até o `AppRouter`.
+- **Fluxo atual de telas:** `SplashScreen` → `MenuScreen` → **JOGAR** → `CutsceneScreen` (Link) → `TutorialScreen` → loading → `QuizScreen` (Quiz 1 + estrelas) → `CutsceneScreen` (Link, `correnteCutscene`) → loading → `QuizScreen` (Quiz 2, `quiz2Questions` + `song_level2`) → `CutsceneScreen` (Lina, `linaCutscene`) → loading → `LeiDeOhmScreen` → volta ao menu. Encadeado em `MenuScreen._startPlay` e métodos `_to*` (um por etapa), via `pushReplacement` — provisório até o `AppRouter`.
 - **Trims por quadro:** `CutsceneFrame` carrega `sideTrim/topTrim/bottomTrim` do sheet (Link precisa: 0.17/0.31; Lina não), repassados ao `SheetSprite` pela `CutsceneScreen` — a mesma tela serve qualquer personagem.
 
 ### Tutorial (antecede o level 1 — quiz de cartas)
