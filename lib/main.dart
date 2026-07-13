@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'core/app_colors.dart';
 import 'core/audio_controller.dart';
@@ -18,6 +19,10 @@ Future<void> main() async {
 
   // Experiência imersiva (esconde barras de status/navegação).
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  // Mantém a tela acesa durante o jogo inteiro: cutscenes e questões deixam o
+  // jogador tempos longos sem tocar na tela e o timeout do aparelho apagaria.
+  await WakelockPlus.enable();
 
   runApp(StartEnergyApp());
 }
