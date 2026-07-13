@@ -9,6 +9,9 @@ class CutsceneFrame {
     required this.text,
     this.spriteColumns = 1,
     this.spriteIndex = 0,
+    this.sideTrim = 0,
+    this.topTrim = 0,
+    this.bottomTrim = 0,
   });
 
   /// Caminho do sprite (ou sprite sheet) do personagem exibido neste quadro.
@@ -22,4 +25,11 @@ class CutsceneFrame {
 
   /// Qual quadro do sheet exibir neste momento (0-based).
   final int spriteIndex;
+
+  /// Frações da célula a aparar em cada borda (repassadas ao `SheetSprite`):
+  /// sheets com folga transparente usam isto para a caixa do sprite
+  /// corresponder ao desenho visível (pés no chão, topo na cabeça).
+  final double sideTrim;
+  final double topTrim;
+  final double bottomTrim;
 }

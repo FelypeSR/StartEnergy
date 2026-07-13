@@ -164,16 +164,9 @@ class _CutsceneScreenState extends State<CutsceneScreen>
                             columns: _frame.spriteColumns,
                             index: _frame.spriteIndex,
                             height: screenHeight * 0.62,
-                            // O sheet (Link.png) já tem boa folga lateral
-                            // entre as poses (sem respingo → sideTrim 0).
-                            // Aparamos o vão transparente sob os pés (p/
-                            // encostar no chão) e acima da cabeça (p/ a caixa
-                            // do sprite corresponder ao desenho). O desenho
-                            // ocupa as linhas ~18%–67% da célula; 0.62 da
-                            // altura da tela dá o mesmo tamanho visível que
-                            // 0.82 dava sem o topTrim.
-                            topTrim: 0.17,
-                            bottomTrim: 0.31,
+                            sideTrim: _frame.sideTrim,
+                            topTrim: _frame.topTrim,
+                            bottomTrim: _frame.bottomTrim,
                           ),
                         ),
                       ),
