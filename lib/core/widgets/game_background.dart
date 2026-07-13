@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../app_assets.dart';
 
-/// Fundo padrão das telas: a sala de aula (`backgroundgame.png`) cobrindo a
-/// tela, com um scrim escuro em gradiente para garantir contraste do conteúdo.
+/// Fundo padrão das telas: imagem de cena cobrindo a tela ([asset]; por
+/// padrão a sala de aula), com um scrim escuro em gradiente para garantir
+/// contraste do conteúdo.
 class GameBackground extends StatelessWidget {
-  const GameBackground({super.key, required this.child});
+  const GameBackground({
+    super.key,
+    this.asset = AppAssets.backgroundGame,
+    required this.child,
+  });
+
+  /// Imagem de fundo (ex.: `AppAssets.backgroundLevel1` nas fases).
+  final String asset;
 
   final Widget child;
 
@@ -14,7 +22,7 @@ class GameBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.asset(AppAssets.backgroundGame, fit: BoxFit.cover),
+        Image.asset(asset, fit: BoxFit.cover),
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(

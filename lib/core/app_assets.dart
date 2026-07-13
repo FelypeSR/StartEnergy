@@ -8,8 +8,19 @@ abstract final class AppAssets {
   /// Fundo de sala de aula usado na tela de introdução e no menu.
   static const String backgroundGame = '$_images/backgroundgame.png';
 
+  /// Fundo do level 1 (Quiz 1).
+  static const String backgroundLevel1 = '$_images/backgroundlevel1.png';
+
   /// Sprite do personagem guia (primeiro personagem da cutscene de introdução).
   static const String linkSprite = '$_images/Link.png';
+
+  /// Sprite sheet da professora Lina (guia da fase Lei de Ohm): 6 poses lado a
+  /// lado, pés na mesma baseline e folga lateral — usar com `SheetSprite`
+  /// (`columns: 6`, trims 0).
+  static const String linaSprite = '$_images/lina.png';
+
+  /// Animação Lottie de carregamento exibida na transição entre fases.
+  static const String loadingPhaseLottie = '$_images/loading_phase.json';
 
   /// Cartas de partícula do quiz (tutorial e level 1).
   static const String protonCard = '$_images/proton.png';
