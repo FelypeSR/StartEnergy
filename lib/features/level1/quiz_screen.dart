@@ -7,6 +7,7 @@ import '../../core/app_assets.dart';
 import '../../core/app_colors.dart';
 import '../../core/audio_controller.dart';
 import '../../core/widgets/game_background.dart';
+import '../../core/widgets/phase_result.dart';
 import '../../core/widgets/sound_button.dart';
 import 'quiz_models.dart';
 import 'quiz_script.dart';
@@ -101,19 +102,24 @@ class _QuizScreenState extends State<QuizScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: _finished
-                    ? _QuizResult(
-                        correct: _results.where((r) => r.correct).length,
-                        total: widget.questions.length,
-                        onContinue: _handleContinue,
-                      )
-                    : _buildQuizColumn(),
+                child: _finished ? _buildResult() : _buildQuizColumn(),
               ),
               SizedBox(width: _reservedRightWidth.r),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildResult() {
+    final correct = _results.where((r) => r.correct).length;
+    return PhaseResult(
+      title: 'Quiz concluído!',
+      scoreText: 'Você acertou $correct de ${widget.questions.length}!',
+      correct: correct,
+      total: widget.questions.length,
+      onContinue: _handleContinue,
     );
   }
 
@@ -144,109 +150,6 @@ class _QuizScreenState extends State<QuizScreen> {
             SizedBox(height: 12.r),
           ],
         ],
-      ),
-    );
-  }
-}
-
-/// Resultado do quiz: 1–3 estrelas ([starsForCorrect]) surgindo com bounce
-/// escalonado, o placar de acertos e o botão Continuar.
-class _QuizResult extends StatefulWidget {
-  const _QuizResult({
-    required this.correct,
-    required this.total,
-    required this.onContinue,
-  });
-
-  final int correct;
-  final int total;
-  final VoidCallback onContinue;
-
-  @override
-  State<_QuizResult> createState() => _QuizResultState();
-}
-
-class _QuizResultState extends State<_QuizResult>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _stars = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1100),
-  )..forward();
-
-  @override
-  void dispose() {
-    _stars.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final earned = starsForCorrect(widget.correct, widget.total);
-    return Center(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 28.r, vertical: 20.r),
-        decoration: BoxDecoration(
-          color: AppColors.backgroundTop.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: AppColors.electricCyan.withValues(alpha: 0.5),
-            width: 1.5,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Quiz concluído!',
-              style: TextStyle(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: 10.r),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var i = 0; i < 3; i++)
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _stars,
-                      curve: Interval(
-                        i * 0.22,
-                        i * 0.22 + 0.34,
-                        curve: Curves.elasticOut,
-                      ),
-                    ),
-                    child: Icon(
-                      i < earned
-                          ? Icons.star_rounded
-                          : Icons.star_border_rounded,
-                      size: 52.r,
-                      color: i < earned
-                          ? AppColors.electricYellow
-                          : AppColors.textMuted,
-                    ),
-                  ),
-              ],
-            ),
-            SizedBox(height: 8.r),
-            Text(
-              'Você acertou ${widget.correct} de ${widget.total}!',
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textMuted,
-              ),
-            ),
-            SizedBox(height: 16.r),
-            SoundButton(
-              label: 'Continuar',
-              width: 220.r,
-              onPressed: widget.onContinue,
-            ),
-          ],
-        ),
       ),
     );
   }

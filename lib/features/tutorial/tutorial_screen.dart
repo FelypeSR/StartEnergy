@@ -7,9 +7,9 @@ import '../../core/app_assets.dart';
 import '../../core/app_colors.dart';
 import '../../core/audio_controller.dart';
 import '../../core/widgets/game_background.dart';
+import '../../core/widgets/pause_button.dart';
 import '../../core/widgets/sheet_sprite.dart';
 import '../../core/widgets/sound_button.dart';
-import '../../core/widgets/sound_toggle_button.dart';
 import '../../core/widgets/speech_balloon.dart';
 import '../cutscene/cutscene_frame.dart';
 import 'tutorial_prompt.dart';
@@ -223,7 +223,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: EdgeInsets.all(12.r),
-                    child: const _PauseButton(),
+                    child: const PauseButton(),
                   ),
                 ),
               ],
@@ -454,81 +454,3 @@ class _OrderBadge extends StatelessWidget {
   }
 }
 
-/// Botão circular de pausa; abre o diálogo com som e sair.
-class _PauseButton extends StatelessWidget {
-  const _PauseButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.35),
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: () {
-          AudioController.instance.playTouch();
-          showDialog<void>(
-            context: context,
-            builder: (_) => const _PauseDialog(),
-          );
-        },
-        child: SizedBox(
-          width: 44.r,
-          height: 44.r,
-          child: Icon(
-            Icons.pause_rounded,
-            color: AppColors.electricCyan,
-            size: 24.r,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PauseDialog extends StatelessWidget {
-  const _PauseDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: AppColors.backgroundTop,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-      title: Row(
-        children: [
-          Text(
-            'Pausa',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w800,
-              fontSize: 22.sp,
-            ),
-          ),
-          const Spacer(),
-          const SoundToggleButton(),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SoundButton(
-            label: 'Continuar',
-            icon: Icons.play_arrow_rounded,
-            primary: true,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          SizedBox(height: 12.r),
-          SoundButton(
-            label: 'Voltar ao menu',
-            icon: Icons.exit_to_app_rounded,
-            // Fecha o diálogo e sai do tutorial (a rota abaixo é o menu).
-            onPressed: () => Navigator.of(context)
-              ..pop()
-              ..pop(),
-          ),
-        ],
-      ),
-    );
-  }
-}

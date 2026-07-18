@@ -9,11 +9,14 @@ import '../../core/widgets/sound_toggle_button.dart';
 import '../../core/app_assets.dart';
 import '../cutscene/cutscene2.dart';
 import '../cutscene/cutscene3.dart';
+import '../cutscene/cutscene4.dart';
 import '../cutscene/cutscene_screen.dart';
 import '../level1/leideohm_screen.dart';
 import '../level1/quiz_screen.dart';
 import '../level2/quiz2_script.dart';
+import '../level3/dragdrop_screen.dart';
 import '../loading/phase_loading_screen.dart';
+import '../phases/phases_screen.dart';
 import '../tutorial/tutorial_screen.dart';
 
 /// Menu principal do StartEnergy (landscape).
@@ -31,7 +34,8 @@ class MenuScreen extends StatelessWidget {
   // Fluxo do JOGAR, um método por etapa (navegação provisória até existir o
   // AppRouter): cutscene do Link → tutorial → loading → Quiz 1 → cutscene 2
   // (Link, corrente elétrica) → loading → Quiz 2 → cutscene 3 (Lina) →
-  // loading → Lei de Ohm → volta ao menu.
+  // loading → Lei de Ohm → cutscene 4 (Lina) → loading → drag & drop de
+  // circuitos → volta ao menu.
   void _startPlay(NavigatorState navigator) {
     navigator.push(
       _route(() => CutsceneScreen(onFinished: () => _toTutorial(navigator))),
@@ -111,7 +115,35 @@ class MenuScreen extends StatelessWidget {
           minDuration: _loadingBeat,
           onFinished: () => navigator.pushReplacement(
             _route(
-              () => LeiDeOhmScreen(onFinished: () => navigator.pop()),
+              () => LeiDeOhmScreen(onFinished: () => _toCutscene4(navigator)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toCutscene4(NavigatorState navigator) {
+    navigator.pushReplacement(
+      _route(
+        () => CutsceneScreen(
+          frames: montagemCutscene,
+          onFinished: () => _toDragDrop(navigator),
+        ),
+      ),
+    );
+  }
+
+  void _toDragDrop(NavigatorState navigator) {
+    navigator.pushReplacement(
+      _route(
+        () => PhaseLoadingScreen(
+          minDuration: _loadingBeat,
+          onFinished: () => navigator.pushReplacement(
+            _route(
+              // TODO: endphase de revisão com os resultados; por ora o fim
+              // do drag & drop encerra o fluxo do JOGAR.
+              () => DragDropScreen(onFinished: (_) => navigator.pop()),
             ),
           ),
         ),
@@ -151,9 +183,9 @@ class MenuScreen extends StatelessWidget {
                       SoundButton(
                         label: 'Fases do jogo',
                         icon: Icons.flag_rounded,
-                        onPressed: () {
-                          // TODO: abrir a seleção de fases.
-                        },
+                        onPressed: () => Navigator.of(context).push(
+                          _route(() => const PhasesScreen()),
+                        ),
                       ),
                       SizedBox(height: 14.r),
                       SoundButton(

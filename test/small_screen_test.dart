@@ -6,6 +6,8 @@ import 'package:startenergy/core/widgets/sheet_sprite.dart';
 import 'package:startenergy/core/widgets/speech_balloon.dart';
 import 'package:startenergy/features/cutscene/cutscene_screen.dart';
 import 'package:startenergy/features/cutscene/cutscene_script.dart';
+import 'package:startenergy/features/level3/circuit_models.dart';
+import 'package:startenergy/features/level3/dragdrop_screen.dart';
 import 'package:startenergy/features/menu/menu_screen.dart';
 import 'package:startenergy/features/splash/splash_screen.dart';
 import 'package:startenergy/features/tutorial/tutorial_prompt.dart';
@@ -105,6 +107,28 @@ void main() {
               reason: 'carta deve pousar dentro da tela');
           expect(rect.top, greaterThanOrEqualTo(0));
         }
+        final balloon = tester.getRect(find.byType(SpeechBalloon));
+        expect(balloon.right, lessThanOrEqualTo(size.width));
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('drag & drop: tabuleiro, tray e balão cabem',
+          (tester) async {
+        await setSize(tester);
+        await tester.pumpWidget(
+          testApp(DragDropScreen(random: Random(3), onFinished: (_) {})),
+        );
+        await tester.pump();
+
+        for (final side in [SlotSide.left, SlotSide.top, SlotSide.right]) {
+          final rect =
+              tester.getRect(find.byKey(ValueKey('slot-${side.name}')));
+          expect(rect.bottom, lessThanOrEqualTo(size.height),
+              reason: 'lacuna deve caber na tela');
+          expect(rect.top, greaterThanOrEqualTo(0));
+        }
+        final tray = tester.getRect(find.byKey(const ValueKey('tray-bulb')));
+        expect(tray.bottom, lessThanOrEqualTo(size.height));
         final balloon = tester.getRect(find.byType(SpeechBalloon));
         expect(balloon.right, lessThanOrEqualTo(size.width));
         expect(tester.takeException(), isNull);

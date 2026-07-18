@@ -44,4 +44,7 @@ abstract final class AppAssets {
 
   /// Música do level 2 (loop). Relativo a `assets/`.
   static const String level2Song = 'audio/song_level2.mp3';
+
+  /// Música do level 3 — drag & drop de circuitos (loop). Relativo a `assets/`.
+  static const String level3Song = 'audio/song_level3.mp3';
 }
