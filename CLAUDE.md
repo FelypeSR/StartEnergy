@@ -50,6 +50,9 @@ lib/
       sound_button.dart            # botão azul + som de toque
       sound_toggle_button.dart     # liga/desliga som
       speech_balloon.dart          # balão de fala DESENHADO (CustomPainter + rabicho)
+      phase_result.dart            # resultado de fim de fase (estrelas com bounce + Continuar),
+                                   #   usado pelo quiz e pelo drag & drop
+      pause_button.dart            # botão de pausa + diálogo (som/sair), usado no tutorial e level 3
       sheet_sprite.dart            # mostra UMA coluna de um sprite sheet horizontal
       formula_card.dart            # laboratório da Lei de Ohm: readout I = V ÷ R ao vivo +
                                    #   OhmCircuit + barras de tensão/resistência (Sliders)
@@ -66,6 +69,8 @@ lib/
                                    #   condutores; falas FINAIS do Questsquiz.md)
       cutscene3.dart               # roteiro da cutscene 3 (Lina apresenta a Lei de Ohm;
                                    #   falas PROVISÓRIAS — TODO(falas))
+      cutscene4.dart               # roteiro da cutscene 4 (Lina apresenta a montagem de
+                                   #   circuitos; falas PROVISÓRIAS — TODO(falas))
       cutscene_screen.dart         # tela: fundo + personagem + balão (digitação) + Pular + mudo;
                                    #   toca cutscene.mp3 (loop) e SFX de toque na tela
     tutorial/
@@ -79,6 +84,9 @@ lib/
     loading/
       phase_loading_screen.dart    # loading entre fases: fundo + Lottie (loading_phase.json)
                                    #   + minDuration/onFinished
+    phases/
+      phases_screen.dart           # seleção direta de fases ("Fases do jogo" do menu): abre cada
+                                   #   fase SEM cutscenes/tutorial; ao terminar, volta pra cá
     level1/
       quiz_models.dart             # QuizQuestion, AnswerResult, shuffledOrder, starsForCorrect
                                    #   (tudo certo → 3★ · ≥ metade → 2★ · ≥ 1 acerto → 1★ · 0 → 0★)
@@ -93,6 +101,21 @@ lib/
     level2/
       quiz2_script.dart            # ARQUIVO EDITÁVEL: as 3 questões do Quiz 2 (Questsquiz.md);
                                    #   roda no mesmo QuizScreen (fundo do level 1, song_level2)
+    level3/
+      circuit_models.dart          # CircuitComponent (peças+distratores), SlotSide, CircuitSlot,
+                                   #   CircuitQuest, QuestResult (erros → estrelas)
+      dragdrop_script.dart         # ARQUIVO EDITÁVEL: as 4 quests de montagem + falas da Lina
+                                   #   (falas PROVISÓRIAS — TODO(falas))
+      dragdrop_screen.dart         # fase drag & drop: tabuleiro + tray sorteado (anti-decoreba)
+                                   #   + Lina; quest completa LIGA o circuito (~2,2s) e avança;
+                                   #   fim mostra PhaseResult (quest sem erro = acerto)
+      widgets/
+        circuit_board.dart         # tabuleiro: laço de fio com lacunas (saveLayer+clear),
+                                   #   DragTargets nas lacunas (peça errada balança e volta),
+                                   #   elétrons animados SÓ quando ligado (Ticker+ValueNotifier)
+        component_piece.dart       # peças desenhadas em código (CustomPainter, estilo OhmCircuit):
+                                   #   pilha, fio, lâmpada (acende), interruptor (fecha), resistor,
+                                   #   cobre, borracha, madeira — trocável por arte do Figma
 assets/
   images/backgroundgame.png        # fundo de sala de aula
   images/Link.png                  # SPRITE SHEET do personagem-guia: 1536×1024 = 3 poses
@@ -116,8 +139,11 @@ test/cutscene_test.dart            # testes da cutscene (avanço, onFinished, Pu
 test/tutorial_test.dart            # testes do tutorial (intro, ordem certa/errada, conclusão)
 test/leideohm_test.dart            # testes da fase Lei de Ohm (estrutura, corrente recalculada
                                    #   no arraste, Concluir; SEM pumpAndSettle — Ticker infinito)
+test/dragdrop_test.dart            # testes do level 3 (encaixe certo/errado, distratores, 4 quests
+                                   #   até o resultado; SEM pumpAndSettle com o circuito ligado)
 test/small_screen_test.dart        # regressão de telas pequenas (568×320, 640×360, 732×412):
-                                   #   menu sem rolagem, splash sem sobreposição, balão fora do sprite
+                                   #   menu sem rolagem, splash sem sobreposição, balão fora do
+                                   #   sprite, tabuleiro/tray/balão do level 3 dentro da tela
 ```
 
 ## Comandos úteis
@@ -140,7 +166,10 @@ Jogo educativo de eletricidade em **3 blocos lineares** (sem árvore binária �
 
 1. **Quiz 1** — opções em **imagem vetorizada (SVG)**; a rotação das imagens muda a cada passagem pelo estágio (anti-decoreba).
 2. **Quiz 2** — 3 questões sobre corrente elétrica (`quiz2_script.dart`), no mesmo `QuizScreen` do Quiz 1; antecedido pela cutscene 2 (Link explica corrente/condutores).
-3. **Drag & Drop** — montar circuitos elétricos.
+3. **Drag & Drop** (level 3) — montar circuitos elétricos em 4 quests com lacunas fixas:
+   circuito mínimo → interruptor → resistor → escolher o condutor (cobre × borracha/madeira).
+   Feedback físico imediato (peça errada balança e volta ao tray; erros contam nas estrelas);
+   quest completa liga o circuito animado. Precedido pela cutscene 4 (Lina).
 
 - O quiz **avança independente de acerto/erro**; os resultados são gravados e a **revisão dos erros acontece só no fim (endphase)** — decisão para manter o jogo polido durante a partida.
 
@@ -154,7 +183,7 @@ Jogo educativo de eletricidade em **3 blocos lineares** (sem árvore binária �
 - **Áudio:** ao entrar, toca `cutscene.mp3` em loop e **pausa** a música do menu; ao sair (fim/Pular), retoma o menu. Cada toque na tela dispara `touchscene.mp3` (não pausa a música). Botão de **mudo** no canto superior direito (afeta só a música).
 - **Provisório:** os sprites já são finais (`Link.png`); **as falas** ainda são placeholders — ver `TODO(falas)` em `cutscene_script.dart`. A cutscene **deveria tocar só na 1ª vez** (precisa de `shared_preferences`), mas isso ainda não foi ligado.
 
-- **Fluxo atual de telas:** `SplashScreen` → `MenuScreen` → **JOGAR** → `CutsceneScreen` (Link) → `TutorialScreen` → loading → `QuizScreen` (Quiz 1 + estrelas) → `CutsceneScreen` (Link, `correnteCutscene`) → loading → `QuizScreen` (Quiz 2, `quiz2Questions` + `song_level2`) → `CutsceneScreen` (Lina, `linaCutscene`) → loading → `LeiDeOhmScreen` → volta ao menu. Encadeado em `MenuScreen._startPlay` e métodos `_to*` (um por etapa), via `pushReplacement` — provisório até o `AppRouter`.
+- **Fluxo atual de telas:** `SplashScreen` → `MenuScreen` → **JOGAR** → `CutsceneScreen` (Link) → `TutorialScreen` → loading → `QuizScreen` (Quiz 1 + estrelas) → `CutsceneScreen` (Link, `correnteCutscene`) → loading → `QuizScreen` (Quiz 2, `quiz2Questions` + `song_level2`) → `CutsceneScreen` (Lina, `linaCutscene`) → loading → `LeiDeOhmScreen` → `CutsceneScreen` (Lina, `montagemCutscene`) → loading → `DragDropScreen` (level 3 + estrelas) → volta ao menu. Encadeado em `MenuScreen._startPlay` e métodos `_to*` (um por etapa), via `pushReplacement` — provisório até o `AppRouter`.
 - **Trims por quadro:** `CutsceneFrame` carrega `sideTrim/topTrim/bottomTrim` do sheet (Link precisa: 0.17/0.31; Lina não), repassados ao `SheetSprite` pela `CutsceneScreen` — a mesma tela serve qualquer personagem.
 
 ### Tutorial (antecede o level 1 — quiz de cartas)
@@ -168,7 +197,7 @@ Jogo educativo de eletricidade em **3 blocos lineares** (sem árvore binária �
 - [x] **Cutscene de introdução** — quadros (sprite + fala), balão desenhado, digitação, Pular, testes (`cutscene_test.dart`).
 - [ ] **Cutscene — finalizar:** trocar falas/sprites provisórios (`TODO` em `cutscene_script.dart`), ajustar visual (posição do personagem, estilo do balão, velocidade), e fazer tocar **só na 1ª vez** via `shared_preferences`.
 - [x] **Tutorial do quiz** (`TutorialScreen`) — intro com balões, cartas caindo em ordem sorteada, toque na ordem das dicas, pausa. Falas provisórias (`TODO(falas)` em `tutorial_script.dart`).
-- [ ] **Definir o que "Fases do jogo" abre** no menu (seleção direta dos blocos vs. trilha de progresso com fases bloqueadas).
+- [x] **"Fases do jogo"** abre a `PhasesScreen` — seleção direta das 4 fases (Quiz das Partículas, Quiz da Corrente, Lei de Ohm, Montagem de Circuitos), sem cutscenes; fase concluída volta à seleção. (Trilha de progresso com bloqueio fica p/ depois, junto com persistência.)
 - [ ] **Criar o `AppRouter`** e substituir a navegação temporária (`navigatorKey` em `main.dart` + push provisório do JOGAR→cutscene→tutorial).
 - [ ] Implementar o **level 1 / Quiz 1** (cartas de partícula; o tutorial deve navegar p/ ele no `onFinished`) e o `core/game_controller.dart` (pontuação + `List<AnswerResult>` para a endphase).
 - [ ] Persistir o estado liga/desliga som (`shared_preferences`) — hoje é só em memória.
