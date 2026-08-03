@@ -1,6 +1,6 @@
 # startenergy
 
-a physical game about electricity
+A digital game about physics
 
 ## Getting Started
 
