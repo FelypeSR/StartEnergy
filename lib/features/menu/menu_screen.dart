@@ -15,9 +15,11 @@ import '../level1/leideohm_screen.dart';
 import '../level1/quiz_screen.dart';
 import '../level2/quiz2_script.dart';
 import '../level3/dragdrop_screen.dart';
+import '../level4/ohms_puzzle_screen.dart';
 import '../loading/phase_loading_screen.dart';
 import '../phases/phases_screen.dart';
 import '../tutorial/tutorial_screen.dart';
+import 'credits_screen.dart';
 
 /// Menu principal do StartEnergy (landscape).
 ///
@@ -35,7 +37,7 @@ class MenuScreen extends StatelessWidget {
   // AppRouter): cutscene do Link → tutorial → loading → Quiz 1 → cutscene 2
   // (Link, corrente elétrica) → loading → Quiz 2 → cutscene 3 (Lina) →
   // loading → Lei de Ohm → cutscene 4 (Lina) → loading → drag & drop de
-  // circuitos → volta ao menu.
+  // circuitos → loading → desafio da Lei de Ohm → volta ao menu.
   void _startPlay(NavigatorState navigator) {
     navigator.push(
       _route(() => CutsceneScreen(onFinished: () => _toTutorial(navigator))),
@@ -142,8 +144,23 @@ class MenuScreen extends StatelessWidget {
           onFinished: () => navigator.pushReplacement(
             _route(
               // TODO: endphase de revisão com os resultados; por ora o fim
-              // do drag & drop encerra o fluxo do JOGAR.
-              () => DragDropScreen(onFinished: (_) => navigator.pop()),
+              // do drag & drop segue direto ao desafio da Lei de Ohm.
+              () => DragDropScreen(onFinished: (_) => _toOhmsPuzzle(navigator)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toOhmsPuzzle(NavigatorState navigator) {
+    navigator.pushReplacement(
+      _route(
+        () => PhaseLoadingScreen(
+          minDuration: _loadingBeat,
+          onFinished: () => navigator.pushReplacement(
+            _route(
+              () => OhmsPuzzleScreen(onFinished: () => navigator.pop()),
             ),
           ),
         ),
@@ -191,9 +208,9 @@ class MenuScreen extends StatelessWidget {
                       SoundButton(
                         label: 'Créditos',
                         icon: Icons.info_outline_rounded,
-                        onPressed: () {
-                          // TODO: abrir créditos / sobre.
-                        },
+                        onPressed: () => Navigator.of(context).push(
+                          _route(() => const CreditsScreen()),
+                        ),
                       ),
                       SizedBox(height: 14.r),
                       SoundButton(

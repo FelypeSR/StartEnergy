@@ -10,7 +10,9 @@ import '../level1/leideohm_screen.dart';
 import '../level1/quiz_screen.dart';
 import '../level2/quiz2_script.dart';
 import '../level3/dragdrop_screen.dart';
+import '../level4/ohms_puzzle_screen.dart';
 import '../loading/phase_loading_screen.dart';
+import '../tutorial/tutorial_screen.dart';
 
 /// Seleção direta de fases (botão "Fases do jogo" do menu).
 ///
@@ -73,6 +75,15 @@ class PhasesScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 20.r),
                       SoundButton(
+                        label: 'Tutorial',
+                        icon: Icons.school_rounded,
+                        onPressed: () => _openPhase(
+                          navigator,
+                          (finish) => TutorialScreen(onFinished: finish),
+                        ),
+                      ),
+                      SizedBox(height: 12.r),
+                      SoundButton(
                         label: 'Quiz das Partículas',
                         icon: Icons.quiz_rounded,
                         onPressed: () => _openPhase(
@@ -110,6 +121,15 @@ class PhasesScreen extends StatelessWidget {
                           navigator,
                           (finish) =>
                               DragDropScreen(onFinished: (_) => finish()),
+                        ),
+                      ),
+                      SizedBox(height: 12.r),
+                      SoundButton(
+                        label: 'Desafio Lei de Ohm',
+                        icon: Icons.calculate_rounded,
+                        onPressed: () => _openPhase(
+                          navigator,
+                          (finish) => OhmsPuzzleScreen(onFinished: finish),
                         ),
                       ),
                       SizedBox(height: 18.r),

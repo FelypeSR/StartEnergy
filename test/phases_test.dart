@@ -17,13 +17,15 @@ void main() {
     expect(find.byType(PhasesScreen), findsOneWidget);
   });
 
-  testWidgets('seleção mostra as 4 fases e o Voltar', (tester) async {
+  testWidgets('seleção mostra as 6 fases e o Voltar', (tester) async {
     await tester.pumpWidget(testApp(const PhasesScreen()));
 
+    expect(find.text('Tutorial'), findsOneWidget);
     expect(find.text('Quiz das Partículas'), findsOneWidget);
     expect(find.text('Quiz da Corrente'), findsOneWidget);
     expect(find.text('Lei de Ohm'), findsOneWidget);
     expect(find.text('Montagem de Circuitos'), findsOneWidget);
+    expect(find.text('Desafio Lei de Ohm'), findsOneWidget);
     expect(find.text('Voltar'), findsOneWidget);
   });
 
