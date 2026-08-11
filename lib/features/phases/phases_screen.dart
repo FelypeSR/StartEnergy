@@ -107,7 +107,7 @@ class PhasesScreen extends StatelessWidget {
                       SizedBox(height: 12.r),
                       SoundButton(
                         label: 'Lei de Ohm',
-                        icon: Icons.science_rounded,
+                        icon: Icons.tune_rounded,
                         onPressed: () => _openPhase(
                           navigator,
                           (finish) => LeiDeOhmScreen(onFinished: finish),
