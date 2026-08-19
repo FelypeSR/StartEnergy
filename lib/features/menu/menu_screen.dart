@@ -15,6 +15,10 @@ import '../level1/quiz_screen.dart';
 import '../level2/quiz2_script.dart';
 import '../loading/phase_loading_screen.dart';
 import '../tutorial/tutorial_screen.dart';
+import '../level3/circuit_screen.dart';
+import '../level4/ohms_puzzle_screen.dart';
+import 'phases_screen.dart';
+import 'credits_screen.dart';
 
 /// Menu principal do StartEnergy (landscape).
 ///
@@ -111,7 +115,37 @@ class MenuScreen extends StatelessWidget {
           minDuration: _loadingBeat,
           onFinished: () => navigator.pushReplacement(
             _route(
-              () => LeiDeOhmScreen(onFinished: () => navigator.pop()),
+              () => LeiDeOhmScreen(onFinished: () => _toCircuit(navigator)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toCircuit(NavigatorState navigator) {
+    navigator.pushReplacement(
+      _route(
+        () => PhaseLoadingScreen(
+          minDuration: _loadingBeat,
+          onFinished: () => navigator.pushReplacement(
+            _route(
+              () => CircuitScreen(onFinished: () => _toOhmsPuzzle(navigator)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toOhmsPuzzle(NavigatorState navigator) {
+    navigator.pushReplacement(
+      _route(
+        () => PhaseLoadingScreen(
+          minDuration: _loadingBeat,
+          onFinished: () => navigator.pushReplacement(
+            _route(
+              () => OhmsPuzzleScreen(onFinished: () => navigator.pop()),
             ),
           ),
         ),
@@ -152,7 +186,16 @@ class MenuScreen extends StatelessWidget {
                         label: 'Fases do jogo',
                         icon: Icons.flag_rounded,
                         onPressed: () {
-                          // TODO: abrir a seleção de fases.
+                          Navigator.of(context).push(
+                            _route(() => PhasesScreen(
+                              onPlayTutorial: () => _toTutorial(Navigator.of(context)),
+                              onPlayPhase1: () => _toQuiz(Navigator.of(context)),
+                              onPlayPhase2: () => _toQuiz2(Navigator.of(context)),
+                              onPlayLeiDeOhm: () => _toLeiDeOhm(Navigator.of(context)),
+                              onPlayCircuit: () => _toCircuit(Navigator.of(context)),
+                              onPlayOhmsPuzzle: () => _toOhmsPuzzle(Navigator.of(context)),
+                            )),
+                          );
                         },
                       ),
                       SizedBox(height: 14.r),
@@ -160,7 +203,9 @@ class MenuScreen extends StatelessWidget {
                         label: 'Créditos',
                         icon: Icons.info_outline_rounded,
                         onPressed: () {
-                          // TODO: abrir créditos / sobre.
+                          Navigator.of(context).push(
+                            _route(() => const CreditsScreen()),
+                          );
                         },
                       ),
                       SizedBox(height: 14.r),
