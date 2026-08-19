@@ -50,6 +50,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -96,3 +97,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Gera os ícones do launcher a partir de assets/icon/.
+# Rodar após alterar a arte:  dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  # Android 7 e anteriores: ícone único, sem camadas.
+  image_path: "assets/icon/icon.png"
+  # Android 8+: duas camadas. A máscara do launcher recorta as bordas, então a
+  # arte vive a 66% do canvas (zona segura) e o fundo é o gradiente estendido.
+  adaptive_icon_background: "assets/icon/icon_background.png"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  # A arte já vem recuada para a zona segura dentro do próprio PNG; o recuo
+  # padrão do pacote (16%) encolheria o desenho uma segunda vez.
+  adaptive_icon_foreground_inset: 0
