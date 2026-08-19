@@ -1,4 +1,4 @@
-package com.example.startenergy
+package br.com.startenergy.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,3 +1,7 @@
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,8 +9,20 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Credenciais de assinatura do release. Fica fora do Git (ver android/.gitignore);
+// em máquina que não tem o arquivo, o release cai na chave de debug mais abaixo.
+// Lido com Reader UTF-8 de propósito: Properties.load(InputStream) assume
+// ISO-8859-1 e corrompe caminho com acento (ex.: "Área de trabalho").
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    InputStreamReader(FileInputStream(keystorePropertiesFile), Charsets.UTF_8).use {
+        keystoreProperties.load(it)
+    }
+}
+
 android {
-    namespace = "com.example.startenergy"
+    namespace = "br.com.startenergy.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,8 +36,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.startenergy"
+        applicationId = "br.com.startenergy.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -30,11 +45,27 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Só assina de verdade onde o key.properties existe. Sem ele a build
+            // continua funcionando (útil para quem só desenvolve), mas o artefato
+            // sai com a chave de debug e NÃO serve para publicar.
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
