@@ -14,50 +14,113 @@ class CreditsScreen extends StatelessWidget {
       body: GameBackground(
         child: SafeArea(
           child: Center(
-            child: Container(
-              width: 500.w,
-              padding: EdgeInsets.all(24.r),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundBottom.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: AppColors.electricYellow.withOpacity(0.5),
-                  width: 2,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(vertical: 24.r),
+              child: Container(
+                width: 500.w,
+                padding: EdgeInsets.all(24.r),
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundBottom.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: AppColors.electricYellow.withValues(alpha: 0.5),
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Créditos',
-                    style: TextStyle(
-                      fontSize: 32.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.electricYellow,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Créditos',
+                      style: TextStyle(
+                        fontSize: 32.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.electricYellow,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 24.r),
-                  Text(
-                    'StartEnergy\n\nDesenvolvido para ensinar conceitos de eletricidade de forma interativa e divertida.\n\nAgradecimentos especiais a todos que testaram e colaboraram com o projeto!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: AppColors.textPrimary,
-                      height: 1.5,
+                    SizedBox(height: 24.r),
+                    const _CreditEntry(
+                      role: 'Desenvolvimento',
+                      name: 'Felipe Santos',
+                      github: '@FelypeSR',
                     ),
-                  ),
-                  SizedBox(height: 32.r),
-                  SoundButton(
-                    label: 'Voltar',
-                    icon: Icons.arrow_back_rounded,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
+                    SizedBox(height: 20.r),
+                    const _CreditEntry(
+                      role: 'Colaboração',
+                      name: 'Lara Emanuelly',
+                      github: '@LaraEmanuelly',
+                    ),
+                    SizedBox(height: 24.r),
+                    Text(
+                      'StartEnergy\n\nDesenvolvido para ensinar conceitos de eletricidade de forma interativa e divertida.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: AppColors.textPrimary,
+                        height: 1.5,
+                      ),
+                    ),
+                    SizedBox(height: 32.r),
+                    SoundButton(
+                      label: 'Voltar',
+                      icon: Icons.arrow_back_rounded,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CreditEntry extends StatelessWidget {
+  const _CreditEntry({
+    required this.role,
+    required this.name,
+    required this.github,
+  });
+
+  final String role;
+  final String name;
+  final String github;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          role.toUpperCase(),
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            color: AppColors.electricCyan,
+          ),
+        ),
+        SizedBox(height: 4.r),
+        Text(
+          name,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        SizedBox(height: 2.r),
+        Text(
+          github,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: AppColors.textMuted,
+          ),
+        ),
+      ],
     );
   }
 }
