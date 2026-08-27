@@ -11,7 +11,7 @@ const List<QuizQuestion> quiz2Questions = [
     options: [
       'O caminho por onde os elétrons passam.',
       'O movimento ordenado dos elétrons.',
-      'A energia armazenada na pilha.',
+      'A energia armazenada na fonte de tensão.',
     ],
     answerIndex: 1,
   ),

@@ -46,7 +46,8 @@ class _OhmsPuzzleScreenState extends State<OhmsPuzzleScreen> {
                 ),
                 SizedBox(height: 4.r),
                 Text(
-                  'Arraste a Bateria (Volts) correta usando a Lei de Ohm (V = R × I).',
+                  'Arraste a Fonte de Tensão (Volts) correta usando a '
+                  'Lei de Ohm (V = R × I).',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16.sp,
@@ -145,7 +146,7 @@ class _OhmsPuzzleScreenState extends State<OhmsPuzzleScreen> {
                               _placedVoltage = details.data;
                               if (_placedVoltage != correctVoltage) {
                                 _isWrong = true;
-                                // Reseta a bateria após curto circuito
+                                // Reseta a fonte de tensão após curto circuito
                                 Future.delayed(const Duration(seconds: 1), () {
                                   if (mounted) {
                                     setState(() {
@@ -165,7 +166,7 @@ class _OhmsPuzzleScreenState extends State<OhmsPuzzleScreen> {
                   ),
                 ),
                 SizedBox(height: 16.r),
-                // Opções de baterias (em linha responsiva)
+                // Opções de fonte de tensão (em linha responsiva)
                 Wrap(
                   spacing: 16.r,
                   runSpacing: 16.r,

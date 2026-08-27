@@ -1,6 +1,6 @@
 /// Componentes das quests de montagem de circuito (peças e distratores).
 enum CircuitComponent {
-  battery('Pilha'),
+  battery('Fonte'),
   wire('Fio'),
   bulb('Lâmpada'),
   switchKey('Interruptor'),
@@ -15,7 +15,7 @@ enum CircuitComponent {
   final String label;
 }
 
-/// Lado do laço do circuito onde a lacuna fica (a pilha ocupa sempre a
+/// Lado do laço do circuito onde a lacuna fica (a fonte ocupa sempre a
 /// esquerda, como no `OhmCircuit`; os demais variam por quest).
 enum SlotSide { left, top, right, bottom }
 

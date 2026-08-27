@@ -46,7 +46,7 @@ const List<QuizQuestion> quizQuestions = [
     answerIndex: 2,
   ),
   QuizQuestion(
-    text: 'Se tirarmos a pilha do circuito, o que acontece?',
+    text: 'Se tirarmos a fonte de tensão do circuito, o que acontece?',
     options: [
       'Tudo continua funcionando',
       'A corrente para e a lâmpada apaga!',

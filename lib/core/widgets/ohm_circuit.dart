@@ -4,9 +4,9 @@ import 'package:flutter/scheduler.dart';
 
 import '../app_colors.dart';
 
-/// Circuito elétrico animado: laço de fio com bateria à esquerda e resistor
-/// no topo, com elétrons (pontos) percorrendo o fio. A velocidade do fluxo é
-/// proporcional a [current] — corrente zero congela os elétrons.
+/// Circuito elétrico animado: laço de fio com fonte de tensão à esquerda e
+/// resistor no topo, com elétrons (pontos) percorrendo o fio. A velocidade do
+/// fluxo é proporcional a [current] — corrente zero congela os elétrons.
 class OhmCircuit extends StatefulWidget {
   const OhmCircuit({super.key, required this.current});
 
@@ -98,7 +98,8 @@ class _CircuitPainter extends CustomPainter {
     _drawCurrentArrow(canvas, rect);
   }
 
-  /// Bateria sobre o trecho esquerdo do fio, com polos + (topo) e − (base).
+  /// Fonte de tensão sobre o trecho esquerdo do fio, com polos + (topo)
+  /// e − (base).
   void _drawBattery(Canvas canvas, Rect rect) {
     final body = Rect.fromCenter(
       center: Offset(rect.left, rect.center.dy),

@@ -3,13 +3,13 @@ import 'circuit_models.dart';
 /// ARQUIVO EDITÁVEL: as 4 quests do drag & drop (level 3) e as falas da Lina.
 ///
 /// Progressão: circuito mínimo → interruptor → resistor (liga com a Lei de
-/// Ohm) → escolher o material condutor. A pilha fica sempre à esquerda do
+/// Ohm) → escolher o material condutor. A fonte fica sempre à esquerda do
 /// laço; a lâmpada, no topo.
 ///
 /// TODO(falas): textos provisórios — SUBSTITUIR pelas falas finais.
 const List<CircuitQuest> dragQuests = [
   CircuitQuest(
-    fala: 'Monte o circuito: pilha, lâmpada e fio no lugar certo!',
+    fala: 'Monte o circuito: fonte de tensão, lâmpada e fio no lugar certo!',
     falaLigou: 'Ligou! O caminho fechou e a corrente circula.',
     slots: [
       CircuitSlot(expected: CircuitComponent.battery, side: SlotSide.left),

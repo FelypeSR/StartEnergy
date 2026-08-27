@@ -102,7 +102,8 @@ Paint _stroke(Color color, double width) => Paint()
   ..strokeCap = StrokeCap.round
   ..color = color;
 
-/// Pilha vertical com polos + (topo) e − (base), como no `OhmCircuit`.
+/// Fonte de tensão vertical com polos + (topo) e − (base), como no
+/// `OhmCircuit`.
 void _paintBattery(Canvas canvas, Rect rect) {
   final body = Rect.fromCenter(
     center: rect.center,
